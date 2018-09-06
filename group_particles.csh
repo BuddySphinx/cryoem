@@ -1,10 +1,10 @@
 #!/bin/tcsh -f
 ###
 #This program is to regroup particles based on defocus
-if ($# != 3) then
- printf "You need input files, split files, input star file, output star file"
+if ($# != 2) then
+ printf "You need split files, input star file"
  exit 0
-if ($# == 3) then
+if ($# == 2) then
  set split_file = $1
  set input_star = $2
  set root=`basename $input_star .star`
