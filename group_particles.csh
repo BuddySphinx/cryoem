@@ -32,45 +32,46 @@ echo "$Defocus_average_ID"
 gawk '/mrcs/{for(i=1;i<='$keyNumber';i++)printf("%s ",$i);printf("%f \n", ($'$rlnDefocusUID' + $'$rlnDefocusVID') /2 );}' $input_star |sort -n -k $Defocus_average_ID  > temp.star
 #Split the dat file according to defocus, 1000A increment
 set Defocus_min=`gawk 'NR==1{printf("%f",$'$Defocus_average_ID');}'< temp.star`
-echo $Defocus_min 
 set Defocus_max=`gawk 'END{printf("%f",$'$Defocus_average_ID');}'< temp.star`
-echo $Defocus_max
 set group_num=`echo "(${Defocus_max}-${Defocus_min})/1000" |bc -l |cut -f 1 -d"." `
-set particle_num=`gawk '/mrcs/{print NR,$1}' temp.star`
-set particles_in_group=`echo "$particle_num/$group_num" | bc -l`
+set particle_num=`gawk 'END{print NR}' temp.star`
+set particles_in_group=`echo "($particle_num)/($group_num)" | bc -l`
 set NrG=0
 
 if ( $rlnGroupID == "" && !( $rlnGroupNameID == "" ) ) then
+ echo "rlnGroupNumber #$keyGroupID" >> $output_star
  while ( $NrG < $group_num )
   #echo "this is good"
-  gawk 'NR > ($NrG*$particles_in_group) && NR <=(($NrG+1)*$particles_in_group){for(i=1;i<='$keyNumber';i++){if ( i==$rlnGroupNameID ) printf("group_%04d ",$NrG+1);else printf("%s ",$i);}printf("%04d ",$NrG+1);prinf("\n")}'temp.star >> $output_star
+  gawk 'NR > ($NrG*$particles_in_group) && NR <=(($NrG+1)*$particles_in_group){for(i=1;i<='$keyNumber';i++){if ( i=='$rlnGroupNameID' ) printf("group_%d ",$NrG+1);else printf("%s ",$i);}printf("%d ",$NrG+1);prinf("\n")}'temp.star >> $output_star
   set NrG = `expr $NrG + 1`
  end
- gawk 'NR >($NrG*$particles_in_group) {for(i=1;i<=$keyNumber;i++){if( i==$rlnGroupNameID ) printf("group_%04d",$NrG+1);else printf("%s ",$i);}printf("%04d ",$NrG+1);printf("\n")}' temp.star >>$output_star
+ gawk 'NR >($NrG*$particles_in_group) {for(i=1;i<='$keyNumber';i++){if( i=='$rlnGroupNameID' ) printf("group_%d",$NrG+1);else printf("%s ",$i);}printf("%d ",$NrG+1);printf("\n")}' temp.star >>$output_star
 
 else if ( $rlnGroupNameID == "" && $rlnGroupID == "" ) then
+ echo "rlnGroupNameID #$keyGroupName">>$output_star
+ echo "rlnGroupNumber #$keyGroupID" >>$output_star
  while ( $NrG < $group_num )
  # echo "this is good"
- gawk 'NR > ($NrG*$particles_in_group) && NR <=(($NrG+1)*particles_in_group){for(i=1;i<=keyNumber;i++){printf("%s ",$i);}printf("%04d ",$NrG+1);printf("group_%04d ",$NrG+1);printf("\n")}' temp.star >>$output_star
+ gawk 'NR > ($NrG*$particles_in_group) && NR <=(($NrG+1)*particles_in_group){for(i=1;i<='$keyNumber';i++){printf("%s ",$i);}printf("%d ",$NrG+1);printf("group_%d ",$NrG+1);printf("\n")}' temp.star >>$output_star
   set NrG = `expr $NrG + 1` 
  end
- gawk 'NR > ($NrG*particles_in_group) {for(i=1;i<=$keyNumber;i++){printf("%s ",$i);}printf("%04d ",$NrG+1);printf("group_%04d ",$NrG+1);printf("\n")}' temp.star >>$output_star
+ gawk 'NR > ($NrG*particles_in_group) {for(i=1;i<='$keyNumber';i++){printf("%s ",$i);}printf("%d ",$NrG+1);printf("group_%d ",$NrG+1);printf("\n")}' temp.star >>$output_star
 
 else if ( $rlnGroupNameID == "" && !( $rlnGroupID == "" ) ) then
  while ( $NrG < $group_num )
  # echo "this is good"
-  gawk 'NR > ($NrG*$particles_in_group) && NR <=(($NrG+1)*particles_in_group){for(i=1;i<=$keyNumber;i++){if ( i==$rlnGroupID ) printf("%04d ",$NrG+1);else printf("%s ",$i);}printf("group_%04d ",$NrG+1);printf("\n")}' temp.star >>output_star
+  gawk 'NR > ($NrG*$particles_in_group) && NR <=(($NrG+1)*particles_in_group){for(i=1;i<='$keyNumber';i++){if (i=='$rlnGroupID') printf("%d ",$NrG+1);else printf("%s ",$i);}printf("group_%d ",$NrG+1);printf("\n")}' temp.star >>output_star
   set NrG = `expr $NrG + 1`
  end
- gawk 'NR > ($NrG*particles_in_group) {for (i=1;i<=$keyNumber;i++){if ( i==$rlnGroupID ) printf("%04d ",$NrG+1);else printf("%s ",$i);}printf("group_04%d ",$NrG+1);printf("\n")}' temp.star >>$output_star 
+ gawk 'NR > ($NrG*particles_in_group) {for (i=1;i<='$keyNumber';i++){if ( i=='$rlnGroupID' ) printf("%04d ",$NrG+1);else printf("%s ",$i);}printf("group_d% ",$NrG+1);printf("\n")}' temp.star >>$output_star 
 
 else 
  while ( $NrG < $group_num )
-  gawk 'NR > ($NrG*particles_in_group)&&NR <=(($NrG+1)*particles_in_group) {for(i=1;i<=$keyNumber;i++){if ( i==$rlnGroupNameID ) printf("group_%04d ",$NrG+1);else if ( i==$rlnGroupID ) printf("%04d ",$NrG+1);else printf("%s ",$i);}printf("\n")}' temp.star >>output_star
+  gawk 'NR > ($NrG*particles_in_group)&&NR <=(($NrG+1)*particles_in_group) {for(i=1;i<='$keyNumber';i++){if ( i=='$rlnGroupNameID' ) printf("group_%d ",$NrG+1);else if ( i=='$rlnGroupID' ) printf("%d ",$NrG+1);else printf("%s ",$i);}printf("\n")}' temp.star >>output_star
  # echo "this is good"
   set NrG = `expr $NrG + 1 `
  end
- gawk 'NR > ($NrG*particles_in_group){for(i=1;i<=$keyNumber;i++){if ( i==$rlnGroupName ) printf("group_%04d ",$NrG+1);else if ( i==$rlnGroupID ) printf("%04d ",$NrG+1);else printf("%s ",$NrG+1);}printf("\n")}' temp.star>>$output_star
+ gawk 'NR > ($NrG*particles_in_group){for(i=1;i<='$keyNumber';i++){if ( i=='$rlnGroupName' ) printf("group_%d ",$NrG+1);else if ( i=='$rlnGroupID' ) printf("%d ",$NrG+1);else printf("%s ",$NrG+1);}printf("\n")}' temp.star>>$output_star
 endif
 
 #rm temp.star
