@@ -40,11 +40,8 @@ set NrG=0
 
 if ( $rlnGroupID == "" && !( $rlnGroupNameID == "" ) ) then
  echo "rlnGroupNumber #$keyGroupID" >> $output_star
- while ( $NrG < $group_num )
   #echo "this is good"
   gawk 'NR > ($NrG*$particles_in_group) && NR <=(($NrG+1)*$particles_in_group){for(i=1;i<='$keyNumber';i++){if ( i=='$rlnGroupNameID' ) printf("group_%d ",$NrG+1);else printf("%s ",$i);}printf("%d ",$NrG+1);prinf("\n")}'temp.star >> $output_star
-  set NrG = `expr $NrG + 1`
- end
  gawk 'NR >($NrG*$particles_in_group) {for(i=1;i<='$keyNumber';i++){if( i=='$rlnGroupNameID' ) printf("group_%d",$NrG+1);else printf("%s ",$i);}printf("%d ",$NrG+1);printf("\n")}' temp.star >>$output_star
 
 else if ( $rlnGroupNameID == "" && $rlnGroupID == "" ) then
@@ -74,5 +71,5 @@ else
  gawk 'NR > ($NrG*particles_in_group){for(i=1;i<='$keyNumber';i++){if ( i=='$rlnGroupName' ) printf("group_%d ",$NrG+1);else if ( i=='$rlnGroupID' ) printf("%d ",$NrG+1);else printf("%s ",$NrG+1);}printf("\n")}' temp.star>>$output_star
 endif
 
-#rm temp.star
+rm -f temp.star
 
