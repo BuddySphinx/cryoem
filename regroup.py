@@ -5,24 +5,23 @@ Created on Mon Sep 10 23:14:03 2018
 @author: yangq
 """
 
-#This is a script to group particles 
+#This is a script to regroup particles based on the defocus
 import sys
 import os
+if len(sys.argv) < 1 or sys.argv[1]=='--help' or sys.argv[1]=='-h':
+    print("Usage: regroup.py input.star")
+    exit()
 input_file=sys.argv[1]
-output_file=sys.argv[2]
+#Set the basename of the output based on input file
+basename=os.path.splitext(input_file)[0]
 GroupNumberindex=0
 GroupNameindex=0
-#os.system('touch -f $2')
-#write the header to the output file
-#global DefocusUindex
-#DefocusUindex=0
-count=0
 with open (input_file,'rw') as input_star:
-    with open (output_file,'w') as output_star:
+    with open ("{}_regrouped.star".format(basename),'w') as output_star:
         #Set up the header
         for line in input_star:
             line=line.split(" ")
-            if line[0].startswith("_rln") or line[0].startswith("data_") or line[0].startswith("loop_") or line[0]=="\n":
+            if line[0].startswith("_rln") or line[0].startswith("data_") or line[0].startswith("loop_") or line[0]=='\n':
                 #Store the variable DefocusV and DefocusV
                 if line[0]=="_rlnDefocusV": 
                    newline=line[1].split("#")
@@ -31,44 +30,88 @@ with open (input_file,'rw') as input_star:
                 elif line[0]=="_rlnDefocusU":
                     newline=line[1].split("#")
                     #global DefocusUindex
-                    DefocusUindex=newline[1]
+                    DefocusUindex=int(newline[1])
                 elif line[0]=="_rlnGroupName":
                     newline=line[1].split("#")
                     #global GroupNameindex
-                    GroupNameindex=newline[1]
+                    GroupNameindex=int(newline[1])
                 elif line[0]=="_rlnGroupNumber":
                     newline=line[1].split("#")
                     #global GroupNumberindex
-                    GroupNumberindex=newline[1]
+                    GroupNumberindex=int(newline[1])
+                head=line
                 line=" ".join(line)
                 output_star.write(line)
-                count+=1
             else:
                 break
             #setup GroupNumber and GroupName conditions
-        header=count
-        headerplus=count+1
-        headerplusplus=count+2
+        head=head[1].split("#")
+        header=int(head)
+        headerplus=header+1
+        headerplusplus=header+2
+        #store rest of the file without headers
+        temp=[line.split()for line in input_star]
+            #Use average Defocus to sort
+        temp.sort(key=lambda x:(float(x[DefocusUindex-1])+float(x[DefocusVindex-1]))/2)
+        #Default Defocus separation 1000A
+        groupnumber=((float(temp[-1][DefocusUindex-1])+float(temp[-1][DefocusVindex-1]))/2-(float(temp[0][DefocusVindex-1])+float(temp[0][DefocusUindex-1]))/2)/1000
+        #Find how many particles per group
+        PPG=int(len(temp)/groupnumber)
         if GroupNumberindex!=0 and GroupNameindex==0:
             output_star.write("_rlnGroupName #"+str(headerplus)+"\n")
-            #Fill the code and sort
-           
+            ppg=0
+            group=1
+            for line in temp:
+                ppg+=1
+                if ppg<=PPG:
+                    group=group
+                else:
+                    group+=1
+                    ppg=0
+                line[GroupNumberindex-1]=str(group)  
+                line.append('group_{}'.format(group))
+                line=" ".join(line)
+                output_star.write(line + '\n')
         elif GroupNumberindex==0 and GroupNameindex!=0:
             output_star.write("_rlnGroupNumber #" +str(headerplus)+"\n")
+            ppg=0
+            group=1
+            for line in temp:
+                ppg+=1
+                if ppg<=PPG:
+                    group=group
+                else:
+                    group+=1
+                    ppg=0
+                line[GroupNameindex-1]='group_{}'.format(group)
+                line.append(str(group))
+                line=" ".join(line)
+                output_star.write(line + '\n')
         elif GroupNumberindex==0 and GroupNameindex==0:
             output_star.write("_rlnGroupName #" + str(headerplus)+"\n")
             output_star.write("_rlnGroupNumber #" + str(headerplusplus)+"\n")
-        else:
-            
-            #output
-#print(DefocusVindex)
-print(GroupNumberindex)
-#print(GroupNameindex)
-       
-        #temp=[line for line in input_star]
-                 
-                
-            
-            
-            
-    
+            pg=0
+            group=1
+            for line in temp:
+                ppg+=1
+                if ppg<=PPG:
+                    group=group
+                else:
+                    group+=1
+                    ppg=0
+                line.append('group_{}'.format(group))
+                line.append(str(group))
+                line=' '.join(line)
+                output_star.write(line + '\n')
+        else: 
+            pg=0
+            group=1
+            for line in temp:
+                ppg+=1
+                if ppg<=PPG:
+                    group=group
+                else:
+                    group+=1
+                    ppg=0
+                line[GroupNameindex-1]='group_{}'.format(group)
+                line[GroupNumberindex-1]=str(group)
