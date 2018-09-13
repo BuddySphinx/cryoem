@@ -74,7 +74,7 @@ with open (input_file,'rw') as input_star:
                 line[GroupNumberindex-1]=str(group)  
                 line.append('group_{}'.format(group))
                 line=" ".join(line)
-                output_star.write(line + '\n')
+                output_star.write(' ' + line + '\n')
         elif GroupNumberindex==0 and GroupNameindex!=0:
             output_star.write("_rlnGroupNumber #" +str(headerplus)+"\n")
             ppg=0
@@ -89,7 +89,7 @@ with open (input_file,'rw') as input_star:
                 line[GroupNameindex-1]='group_{}'.format(group)
                 line.append(str(group))
                 line=" ".join(line)
-                output_star.write(line + '\n')
+                output_star.write(' ' + line + '\n')
         elif GroupNumberindex==0 and GroupNameindex==0:
             output_star.write("_rlnGroupName #" + str(headerplus)+"\n")
             output_star.write("_rlnGroupNumber #" + str(headerplusplus)+"\n")
@@ -105,7 +105,7 @@ with open (input_file,'rw') as input_star:
                 line.append('group_{}'.format(group))
                 line.append(str(group))
                 line=' '.join(line)
-                output_star.write(line + '\n')
+                output_star.write(' ' + line + '\n')
         else: 
             pg=0
             group=1
@@ -118,3 +118,5 @@ with open (input_file,'rw') as input_star:
                     ppg=0
                 line[GroupNameindex-1]='group_{}'.format(group)
                 line[GroupNumberindex-1]=str(group)
+                line=' '.join(line)
+                output_star.write(' ' + line + '\n')
