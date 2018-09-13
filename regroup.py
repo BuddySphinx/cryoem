@@ -16,6 +16,7 @@ input_file=sys.argv[1]
 basename=os.path.splitext(input_file)[0]
 GroupNumberindex=0
 GroupNameindex=0
+count=0
 with open (input_file,'rw') as input_star:
     with open ("{}_regrouped.star".format(basename),'w') as output_star:
         #Set up the header
@@ -42,15 +43,17 @@ with open (input_file,'rw') as input_star:
                 head=line
                 line=" ".join(line)
                 output_star.write(line)
+		count+=1
             else:
                 break
             #setup GroupNumber and GroupName conditions
         head=head[1].split("#")
-        header=int(head)
+        header=int(head[1])
         headerplus=header+1
         headerplusplus=header+2
         #store rest of the file without headers
-        temp=[line.split()for line in input_star]
+        temp1=[line.split()for line in input_star]
+	temp=temp1[count:-1]
             #Use average Defocus to sort
         temp.sort(key=lambda x:(float(x[DefocusUindex-1])+float(x[DefocusVindex-1]))/2)
         #Default Defocus separation 1000A
