@@ -93,7 +93,7 @@ with open (input_file,'rw') as input_star:
         elif GroupNumberindex==0 and GroupNameindex==0:
             output_star.write("_rlnGroupName #" + str(headerplus)+"\n")
             output_star.write("_rlnGroupNumber #" + str(headerplusplus)+"\n")
-            pg=0
+            ppg=0
             group=1
             for line in temp:
                 ppg+=1
@@ -107,7 +107,7 @@ with open (input_file,'rw') as input_star:
                 line=' '.join(line)
                 output_star.write(' ' + line + '\n')
         else: 
-            pg=0
+            ppg=0
             group=1
             for line in temp:
                 ppg+=1
