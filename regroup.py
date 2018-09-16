@@ -53,39 +53,37 @@ with open (input_file,'rw') as input_star:
         headerplusplus=header+2
         #store rest of the file without headers
         temp1=[line.split()for line in input_star]
-	temp=temp1[count:-1]
+        temp=temp1[count:-1]
             #Use average Defocus to sort
         temp.sort(key=lambda x:(float(x[DefocusUindex-1])+float(x[DefocusVindex-1]))/2)
         #Default Defocus separation 1000A
         groupnumber=((float(temp[-1][DefocusUindex-1])+float(temp[-1][DefocusVindex-1]))/2-(float(temp[0][DefocusVindex-1])+float(temp[0][DefocusUindex-1]))/2)/1000
         #Find how many particles per group
-        PPG=int(len(temp)/groupnumber)
+        Defocus_min=(float(temp[0][DefocusUindex-1])+float(temp[0][DefocusVindex-1]))/2
         if GroupNumberindex!=0 and GroupNameindex==0:
             output_star.write("_rlnGroupName #"+str(headerplus)+"\n")
-            ppg=0
             group=1
             for line in temp:
-                ppg+=1
-                if ppg<=PPG:
+                Defocusaverage=(float(line[DefocusUindex-1])+float(line[DefocusVindex-1]))/2
+                Defocus_group=Defocus_min+1000*group
+                if Defocusaverage<Defocus_group:
                     group=group
                 else:
                     group+=1
-                    ppg=0
                 line[GroupNumberindex-1]=str(group)  
                 line.append('group_{}'.format(group))
                 line=" ".join(line)
                 output_star.write(' ' + line + '\n')
         elif GroupNumberindex==0 and GroupNameindex!=0:
             output_star.write("_rlnGroupNumber #" +str(headerplus)+"\n")
-            ppg=0
             group=1
             for line in temp:
-                ppg+=1
-                if ppg<=PPG:
+                Defocusaverage=(float(line[DefocusUindex-1])+float(line[DefocusVindex-1]))/2
+                Defocus_group=Defocus_min+1000*group
+                if Defocusaverage<Defocus_group:
                     group=group
                 else:
                     group+=1
-                    ppg=0
                 line[GroupNameindex-1]='group_{}'.format(group)
                 line.append(str(group))
                 line=" ".join(line)
@@ -93,29 +91,27 @@ with open (input_file,'rw') as input_star:
         elif GroupNumberindex==0 and GroupNameindex==0:
             output_star.write("_rlnGroupName #" + str(headerplus)+"\n")
             output_star.write("_rlnGroupNumber #" + str(headerplusplus)+"\n")
-            ppg=0
             group=1
             for line in temp:
-                ppg+=1
-                if ppg<=PPG:
+                Defocusaverage=(float(line[DefocusUindex-1])+float(line[DefocusVindex-1]))/2
+                Defocus_group=Defocus_min+1000*group
+                if Defocusaverage<Defocus_group:
                     group=group
                 else:
                     group+=1
-                    ppg=0
                 line.append('group_{}'.format(group))
                 line.append(str(group))
                 line=' '.join(line)
                 output_star.write(' ' + line + '\n')
         else: 
-            ppg=0
             group=1
             for line in temp:
-                ppg+=1
-                if ppg<=PPG:
+                Defocusaverage=(float(line[DefocusUindex-1])+float(line[DefocusVindex-1]))/2
+                Defocus_group=Defocus_min+1000*group
+                if Defocusaverage<Defocus_group:
                     group=group
                 else:
                     group+=1
-                    ppg=0
                 line[GroupNameindex-1]='group_{}'.format(group)
                 line[GroupNumberindex-1]=str(group)
                 line=' '.join(line)
