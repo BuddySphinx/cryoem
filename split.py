@@ -7,6 +7,9 @@ Created on Sun Sep 16 22:45:49 2018
 #This script is to split particles for each micrograph
 import sys
 import os
+if len(sys.argv) < 1 or sys.argv[1]=='--help' or sys.argv[1]=='-h':
+    print("Usage: split.py particles.star")
+    exit()
 input_file=sys.argv[1]
 header=[]
 temp=[]
