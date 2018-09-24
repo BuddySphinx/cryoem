@@ -1,2 +1,2 @@
 # cryoem
-Some useful scripts for text editing in cryoem
+Some useful scripts for editing star file in cryoem
