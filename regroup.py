@@ -43,7 +43,7 @@ with open (input_file,'rw') as input_star:
                 head=line
                 line=" ".join(line)
                 output_star.write(line)
-		count+=1
+                count+=1
             else:
                 break
             #setup GroupNumber and GroupName conditions
@@ -53,6 +53,7 @@ with open (input_file,'rw') as input_star:
         headerplusplus=header+2
         #store rest of the file without headers
         temp1=[line.split()for line in input_star]
+		#chop off the last '\n'
         temp=temp1[count:-1]
             #Use average Defocus to sort
         temp.sort(key=lambda x:(float(x[DefocusUindex-1])+float(x[DefocusVindex-1]))/2)
